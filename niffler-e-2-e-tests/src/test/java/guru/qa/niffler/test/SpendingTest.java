@@ -2,7 +2,7 @@ package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.jupiter.DisabledByIssue;
+//import guru.qa.niffler.jupiter.DisabledByIssue;
 import guru.qa.niffler.jupiter.GenerateSpend;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
@@ -37,7 +37,7 @@ public class SpendingTest extends BaseWebTest {
       category = "Обучение",
       currency = CurrencyValues.RUB
   )
-  @DisabledByIssue("74")
+ // @DisabledByIssue("74")
   @Test
   void spendingShouldBeDeletedByButtonDeleteSpending(SpendJson spend) {
     $(".spendings-table tbody")
