@@ -16,8 +16,7 @@ public class SpendingsComponent {
 		spendingsTable
 				.$$("tr")
 				.find(text(spendDescription))
-				.$$("td")
-				.first()
+				.$("td")
 				.scrollTo()
 				.click();
 		return this;
