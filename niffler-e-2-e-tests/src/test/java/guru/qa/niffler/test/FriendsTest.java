@@ -12,28 +12,28 @@ import static guru.qa.niffler.jupiter.User.UserType.WITH_FRIENDS;
 @ExtendWith(UsersQueueExtension.class)
 public class FriendsTest extends BaseWebTest {
 
-  @BeforeEach
-  void doLogin(@User(WITH_FRIENDS) UserJson user) {
-    System.out.println(user.username());
-    System.out.println(user.testData().password());
-    mainPage
-            .open();
-    welcomePage
-            .clickLoginButton()
-            .loginAsUser(user.username(), user.testData().password());
-  }
+	@BeforeEach
+	void doLogin(@User(WITH_FRIENDS) UserJson user) {
+		System.out.println(user.username());
+		System.out.println(user.testData().password());
+		mainPage
+				.open();
+		welcomePage
+				.clickLoginButton()
+				.loginAsUser(user.username(), user.testData().password());
+	}
 
-  @Test
-  void friendShouldBeInFriendsTable(@User(WITH_FRIENDS) UserJson user) {
-    mainPage
-            .clickOnFriendsHeaderTab()
-            .friendShouldBeInTable(user);
-  }
+	@Test
+	void friendShouldBeInFriendsTable(@User(WITH_FRIENDS) UserJson user) {
+		mainPage
+				.clickOnFriendsHeaderTab()
+				.friendShouldBeInTable(user);
+	}
 
-  @Test
-  void friendShouldBeInPeopleTable(@User(WITH_FRIENDS) UserJson user) {
-    mainPage
-            .clickOnPeopleHeaderTab()
-            .friendShouldBeInTable(user);
-  }
+	@Test
+	void friendShouldBeInPeopleTable(@User(WITH_FRIENDS) UserJson user) {
+		mainPage
+				.clickOnPeopleHeaderTab()
+				.friendShouldBeInTable(user);
+	}
 }

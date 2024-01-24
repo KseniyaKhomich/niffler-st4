@@ -40,6 +40,6 @@ public class PeoplePage {
 				.$$("td")
 				.find(text("You are friends"))
 				.shouldBe(visible);
-	return this;
+		return this;
 	}
 }

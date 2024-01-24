@@ -10,7 +10,7 @@ import static guru.qa.niffler.jupiter.User.UserType.INVITATION_SENT;
 import static guru.qa.niffler.jupiter.User.UserType.RECEIVED;
 
 @ExtendWith(UsersQueueExtension.class)
-public class InvitationReceivedTest extends BaseWebTest{
+public class InvitationReceivedTest extends BaseWebTest {
 	@Test
 	void requestShouldBeDisplayedOnFriendsPage(@User(RECEIVED) UserJson receivedInvitationUser, @User(INVITATION_SENT) UserJson sentInvitationUser) {
 		mainPage
@@ -31,10 +31,5 @@ public class InvitationReceivedTest extends BaseWebTest{
 				.loginAsUser(receivedInvitationUser.username(), receivedInvitationUser.testData().password())
 				.clickOnPeopleHeaderTab()
 				.requestFromUserShouldBeDisplayed(sentInvitationUser);
-	}
-
-	@Test
-	void noFriendsShouldBeDisplayed(@User(RECEIVED) UserJson receivedInvitationUser, @User(INVITATION_SENT) UserJson sentInvitationUser) throws InterruptedException {
-       Thread.sleep(5000);
 	}
 }

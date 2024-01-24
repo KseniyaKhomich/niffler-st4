@@ -19,9 +19,7 @@ public class FriendsPage {
 	}
 
 	public FriendsPage requestFromUserShouldBeDisplayed(UserJson sentInvitationUser) {
-		SelenideElement rowElement = friendsTable
-				.$$("tr")
-				.find(text(sentInvitationUser.username()));
+		SelenideElement rowElement = friendsTable.$$("tr").find(text(sentInvitationUser.username()));
 
 		rowElement
 				.find(".button-icon_type_submit")
