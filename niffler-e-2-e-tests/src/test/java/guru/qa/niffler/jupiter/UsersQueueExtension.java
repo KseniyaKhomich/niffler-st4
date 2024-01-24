@@ -30,6 +30,7 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterTestExecuti
 
   static {
     Queue<UserJson> commonQueue = new ConcurrentLinkedQueue<>();
+    commonQueue.add(user("commonUser", "12345", COMMON));
     users.put(COMMON, commonQueue);
 
     Queue<UserJson> friendsQueue = new ConcurrentLinkedQueue<>();
@@ -49,8 +50,6 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterTestExecuti
 
   @Override
   public void beforeEach(ExtensionContext context) {
-    System.out.println("before   11111");
-
     List<Parameter> beforeMethodParameters = Arrays.stream(context.getRequiredTestClass().getDeclaredMethods())
             .filter(method -> method.isAnnotationPresent(BeforeEach.class))
             .map(Executable::getParameters)
@@ -90,19 +89,12 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterTestExecuti
 
   @Override
   public void afterTestExecution(ExtensionContext context) {
-    System.out.println("after test");
     Map<User.UserType, UserJson> testCandidates = (Map<User.UserType, UserJson>) context.getStore(NAMESPACE)
             .get(context.getUniqueId(), Map.class);
-    System.out.println(testCandidates);
 
-    for (User.UserType userType : testCandidates.keySet()) {
-      users.get(userType).add(testCandidates.get(userType));
-    }
-//    testCandidates.values().forEach(
-//            user -> users.get(user.testData().userType()).add(user)
-//    );
-
-    System.out.println(users);
+    testCandidates.values().forEach(
+            user -> users.get(user.testData().userType()).add(user)
+    );
   }
 
   @Override
@@ -115,15 +107,9 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterTestExecuti
 
   @Override
   public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    System.out.println("resolve   11111");
-
-//    return (UserJson) extensionContext.getStore(NAMESPACE)
-//            .get(extensionContext.getUniqueId(), Map.class)
-//            .get(parameterContext.getParameter().getAnnotation(User.class).value());
-
     return (UserJson) extensionContext.getStore(NAMESPACE)
-           .get(extensionContext.getUniqueId(), Map.class)
-           .get(parameterContext.findAnnotation(User.class).get().value());
+            .get(extensionContext.getUniqueId(), Map.class)
+            .get(parameterContext.getParameter().getAnnotation(User.class).value());
   }
 
   private static UserJson user(String username, String password, User.UserType userType) {
