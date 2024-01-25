@@ -82,7 +82,6 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterTestExecuti
 				testCandidate = queue.poll();
 			}
 			testCandidates.put(annotation.value(), testCandidate);
-			;
 		}
 		context.getStore(NAMESPACE).put(context.getUniqueId(), testCandidates);
 	}
