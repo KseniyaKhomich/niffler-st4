@@ -12,6 +12,6 @@ public @interface User {
   UserType value() default UserType.COMMON;
 
   enum UserType {
-    WITH_FRIENDS, COMMON
+    INVITATION_SENT, RECEIVED, WITH_FRIENDS, COMMON
   }
 }
