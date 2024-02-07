@@ -70,20 +70,6 @@ public class UserRepositoryJdbc implements UserRepository {
         authorityPs.executeBatch();
         conn.commit();
         user.setId(authUserId);
-
-        try (ResultSet resultSet = authorityPs.getResultSet()) {
-          List<AuthorityEntity> authorityEntityList = new ArrayList<>();
-
-          while (resultSet.next()) {
-            AuthorityEntity authorityEntity = new AuthorityEntity();
-            authorityEntity.setId(UUID.fromString(resultSet.getString("id")));
-            authorityEntity.setAuthority(Authority.valueOf(resultSet.getString("authority")));
-            authorityEntity.setUser(user);
-            authorityEntityList.add(authorityEntity);
-          }
-
-          user.setAuthorities(authorityEntityList);
-        }
       } catch (Exception e) {
         conn.rollback();
         throw e;
@@ -263,7 +249,6 @@ public class UserRepositoryJdbc implements UserRepository {
     }
   }
 
-  @Override
   public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
     try (Connection conn = authDs.getConnection()) {
       conn.setAutoCommit(false);
@@ -276,7 +261,7 @@ public class UserRepositoryJdbc implements UserRepository {
         usersPs.executeUpdate();
 
         delAuthPs.setObject(1, userAuthEntity.getId());
-        usersPs.executeUpdate();
+        delAuthPs.executeUpdate();
 
         List<Authority> authorities = userAuthEntity.getAuthorities()
                 .stream()
@@ -292,20 +277,6 @@ public class UserRepositoryJdbc implements UserRepository {
         }
         insAuthPs.executeBatch();
         conn.commit();
-
-        try (ResultSet resultSet = insAuthPs.getResultSet()) {
-          List<AuthorityEntity> authorityEntityList = new ArrayList<>();
-
-          while (resultSet.next()) {
-            AuthorityEntity authorityEntity = new AuthorityEntity();
-            authorityEntity.setId(UUID.fromString(resultSet.getString("id")));
-            authorityEntity.setAuthority(Authority.valueOf(resultSet.getString("authority")));
-            authorityEntity.setUser(userAuthEntity);
-            authorityEntityList.add(authorityEntity);
-          }
-
-          userAuthEntity.setAuthorities(authorityEntityList);
-        }
       } catch (Exception e) {
         conn.rollback();
         throw e;
@@ -313,6 +284,7 @@ public class UserRepositoryJdbc implements UserRepository {
         conn.setAutoCommit(true);
       }
     } catch (SQLException e) {
+      System.out.println(e.getMessage());
       throw new RuntimeException();
     }
     return userAuthEntity;

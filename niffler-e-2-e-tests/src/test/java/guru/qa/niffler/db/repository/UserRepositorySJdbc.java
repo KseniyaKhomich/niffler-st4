@@ -153,9 +153,4 @@ public class UserRepositorySJdbc implements UserRepository {
       return null;
     });
   }
-
-  @Override
-  public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
-    return null;
-  }
 }

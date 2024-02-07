@@ -63,14 +63,6 @@ public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCa
 
 		userRepository.deleteInAuthById(userAuthEntity.getId());
 		userRepository.deleteInUserdataById(userEntity.getId());
-
-		//remove that
-		UserAuthEntity testUzer = userRepository.findByIdInAuth(UUID.fromString("9f845d8a-2246-4eb7-9255-dd12f81a0a11")).get();
-
-		testUzer.setUsername(userAuthEntity.getUsername() + "1");
-
-		userRepository.updateUserInAuth(testUzer);
-		System.out.println("test");
 	}
 
 	@Override

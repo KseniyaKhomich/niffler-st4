@@ -12,21 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(UserRepositoryExtension.class)
 public class LoginTestJDBC extends BaseWebTest {
-//	@DbUser
-//	@Test
-//	void loginJDBC(UserAuthEntity userAuth) {
-//		mainPage.open();
-//		welcomePage.clickLoginButton()
-//				.loginAsUser(userAuth.getUsername(), userAuth.getPassword());
-//	}
-
-
 	@DbUser
 	@Test
-	void update(UserAuthEntity userAuth) {
-
+	void loginJDBC(UserAuthEntity userAuth) {
+		mainPage.open();
+		welcomePage.clickLoginButton()
+				.loginAsUser(userAuth.getUsername(), userAuth.getPassword());
 	}
-
-
-
 }

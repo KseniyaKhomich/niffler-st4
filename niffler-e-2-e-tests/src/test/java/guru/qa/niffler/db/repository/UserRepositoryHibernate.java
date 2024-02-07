@@ -63,9 +63,4 @@ public class UserRepositoryHibernate extends JpaService implements UserRepositor
     UserEntity toBeDeleted = findByIdInUserdata(id).get();
     remove(USERDATA, toBeDeleted);
   }
-
-  @Override
-  public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
-    return null;
-  }
 }
