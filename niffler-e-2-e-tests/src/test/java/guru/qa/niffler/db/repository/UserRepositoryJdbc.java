@@ -88,8 +88,8 @@ public class UserRepositoryJdbc implements UserRepository {
     try (Connection conn = udDs.getConnection()) {
       try (PreparedStatement ps = conn.prepareStatement(
               "INSERT INTO \"user\" " +
-                      "(username, currency) " +
-                      "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+                   "(username, currency) " +
+                   "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
         ps.setString(1, user.getUsername());
         ps.setString(2, user.getCurrency().name());
         ps.executeUpdate();
@@ -187,7 +187,7 @@ public class UserRepositoryJdbc implements UserRepository {
     try (Connection conn = authDs.getConnection()) {
       conn.setAutoCommit(false);
       try (PreparedStatement authorityPs = conn.prepareStatement("DELETE FROM \"authority\" WHERE user_id = ?");
-            PreparedStatement userPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ?")) {
+           PreparedStatement userPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ?")) {
 
         authorityPs.setObject(1, id);
         userPs.setObject(1, id);
@@ -213,8 +213,8 @@ public class UserRepositoryJdbc implements UserRepository {
     try (Connection conn = udDs.getConnection()) {
       conn.setAutoCommit(false);
       try (PreparedStatement usersPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ? ");
-          PreparedStatement friendsPs = conn.prepareStatement("DELETE FROM friendship WHERE user_id = ?");
-          PreparedStatement invitesPs = conn.prepareStatement("DELETE FROM friendship WHERE friend_id = ?")) {
+           PreparedStatement friendsPs = conn.prepareStatement("DELETE FROM friendship WHERE user_id = ?");
+           PreparedStatement invitesPs = conn.prepareStatement("DELETE FROM friendship WHERE friend_id = ?")) {
 
         usersPs.setObject(1, id);
         friendsPs.setObject(1, id);
@@ -267,7 +267,6 @@ public class UserRepositoryJdbc implements UserRepository {
                 .stream()
                 .map(AuthorityEntity::getAuthority)
                 .toList();
-
 
         for (Authority authority : authorities) {
           insAuthPs.setObject(1, userAuthEntity.getId());
