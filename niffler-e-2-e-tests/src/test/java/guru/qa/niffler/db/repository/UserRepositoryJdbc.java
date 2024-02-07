@@ -158,7 +158,7 @@ public class UserRepositoryJdbc implements UserRepository {
   @Override
   public Optional<UserEntity> findByIdInUserdata(UUID id) {
     try (Connection conn = udDs.getConnection()) {
-      try (PreparedStatement usersPs = conn.prepareStatement("SELECT * FROM \"user\" WHERE id = ? ")) {
+      try (PreparedStatement usersPs = conn.prepareStatement("SELECT * FROM \"user\" WHERE id = ?")) {
 
         usersPs.setObject(1, id);
 
