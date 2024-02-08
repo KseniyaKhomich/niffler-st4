@@ -17,7 +17,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCa
 
 	Faker faker = new Faker();
 
-	private final UserRepository userRepository = new UserRepositoryJdbc();
+	private final UserRepository userRepository = UserRepository.getInstance();
 
 
 	@Override

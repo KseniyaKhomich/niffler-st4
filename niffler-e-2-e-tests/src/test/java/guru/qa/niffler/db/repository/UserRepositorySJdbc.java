@@ -2,6 +2,8 @@ package guru.qa.niffler.db.repository;
 
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.Database;
+import guru.qa.niffler.db.model.Authority;
+import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserAuthEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import guru.qa.niffler.db.sjdbc.UserAuthEntityResultSetExtractor;
@@ -16,8 +18,10 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -152,5 +156,50 @@ public class UserRepositorySJdbc implements UserRepository {
       udTemplate.update("DELETE FROM \"user\" WHERE id = ?", id);
       return null;
     });
+  }
+
+  @Override
+  public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
+     return authTxt.execute(status -> {
+
+       authTemplate.update(
+               "UPDATE \"user\" SET username = ? WHERE id = ?",
+               userAuthEntity.getUsername(),
+               userAuthEntity.getId()
+       );
+
+       authTemplate.update(
+               "DELETE FROM \"authority\" WHERE user_id = ?",
+               userAuthEntity.getId()
+       );
+
+       authTemplate.batchUpdate("INSERT INTO \"authority\" " +
+               "(user_id, authority) " +
+               "VALUES (?, ?)", new BatchPreparedStatementSetter() {
+         @Override
+         public void setValues(PreparedStatement ps, int i) throws SQLException {
+           ps.setObject(1, userAuthEntity.getId());
+           ps.setString(2, userAuthEntity.getAuthorities().get(i).getAuthority().name());
+         }
+
+         @Override
+         public int getBatchSize() {
+           return userAuthEntity.getAuthorities().size();
+         }
+       });
+
+       return userAuthEntity;
+	});
+  }
+
+  @Override
+  public UserEntity updateUserInUserdata(UserEntity userEntity) {
+    udTemplate.update(
+            "UPDATE \"user\" SET currency = ?, username = ? WHERE id = ?",
+            userEntity.getCurrency().name(),
+            userEntity.getUsername(),
+            userEntity.getId());
+
+    return userEntity;
   }
 }

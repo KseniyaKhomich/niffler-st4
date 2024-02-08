@@ -10,9 +10,11 @@ import guru.qa.niffler.jupiter.annotation.DbUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.lang.reflect.Type;
+
 @ExtendWith(UserRepositoryExtension.class)
 public class LoginTestJDBC extends BaseWebTest {
-	@DbUser
+	@DbUser()
 	@Test
 	void loginJDBC(UserAuthEntity userAuth) {
 		mainPage.open();
