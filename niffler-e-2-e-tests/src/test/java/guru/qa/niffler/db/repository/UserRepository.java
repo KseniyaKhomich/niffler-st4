@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface UserRepository {
 
   static UserRepository getInstance() {
-    if (System.getProperty("repository").isEmpty()) {
+    if (System.getProperty("repository") == null) {
       throw new RuntimeException("Repository parameter isn't found");
     }
 

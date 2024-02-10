@@ -2,8 +2,6 @@ package guru.qa.niffler.db.repository;
 
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.Database;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
 import guru.qa.niffler.db.model.UserAuthEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import guru.qa.niffler.db.sjdbc.UserAuthEntityResultSetExtractor;
@@ -18,10 +16,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
