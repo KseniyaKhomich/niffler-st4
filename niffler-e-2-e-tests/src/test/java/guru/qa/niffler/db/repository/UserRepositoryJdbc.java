@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -82,49 +84,12 @@ public class UserRepositoryJdbc implements UserRepository {
   }
 
   @Override
-  public Optional<UserAuthEntity> findByIdInAuth(UUID id) {
-    try (Connection conn = authDs.getConnection();
-         PreparedStatement usersPs = conn.prepareStatement("SELECT * " +
-             "FROM \"user\" u " +
-             "JOIN \"authority\" a ON u.id = a.user_id " +
-             "where u.id = ?")) {
-      usersPs.setObject(1, id);
-
-      usersPs.execute();
-      UserAuthEntity user = new UserAuthEntity();
-      boolean userProcessed = false;
-      try (ResultSet resultSet = usersPs.getResultSet()) {
-        while (resultSet.next()) {
-          if (!userProcessed) {
-            user.setId(resultSet.getObject(1, UUID.class));
-            user.setUsername(resultSet.getString(2));
-            user.setPassword(resultSet.getString(3));
-            user.setEnabled(resultSet.getBoolean(4));
-            user.setAccountNonExpired(resultSet.getBoolean(5));
-            user.setAccountNonLocked(resultSet.getBoolean(6));
-            user.setCredentialsNonExpired(resultSet.getBoolean(7));
-            userProcessed = true;
-          }
-
-          AuthorityEntity authority = new AuthorityEntity();
-          authority.setId(resultSet.getObject(8, UUID.class));
-          authority.setAuthority(Authority.valueOf(resultSet.getString(10)));
-          user.getAuthorities().add(authority);
-        }
-      }
-      return userProcessed ? Optional.of(user) : Optional.empty();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Override
   public UserEntity createInUserdata(UserEntity user) {
     try (Connection conn = udDs.getConnection()) {
       try (PreparedStatement ps = conn.prepareStatement(
-          "INSERT INTO \"user\" " +
-              "(username, currency) " +
-              "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+              "INSERT INTO \"user\" " +
+                   "(username, currency) " +
+                   "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
         ps.setString(1, user.getUsername());
         ps.setString(2, user.getCurrency().name());
         ps.executeUpdate();
@@ -146,49 +111,98 @@ public class UserRepositoryJdbc implements UserRepository {
   }
 
   @Override
-  public Optional<UserEntity> findByIdInUserdata(UUID id) {
-    UserEntity user = new UserEntity();
-    try (Connection conn = udDs.getConnection();
-         PreparedStatement usersPs = conn.prepareStatement("SELECT * FROM \"user\" WHERE id = ? ")) {
-      usersPs.setObject(1, id);
-      usersPs.execute();
-      try (ResultSet resultSet = usersPs.getResultSet()) {
-        if (resultSet.next()) {
-          user.setId(resultSet.getObject("id", UUID.class));
-          user.setUsername(resultSet.getString("username"));
-          user.setCurrency(CurrencyValues.valueOf(resultSet.getString("currency")));
-          user.setFirstname(resultSet.getString("firstname"));
-          user.setSurname(resultSet.getString("surname"));
-          user.setPhoto(resultSet.getBytes("photo"));
-        } else {
-          return Optional.empty();
+  public Optional<UserAuthEntity> findByIdInAuth(UUID id) {
+    UserAuthEntity userAuthEntity = new UserAuthEntity();
+
+    try (Connection conn = authDs.getConnection()) {
+      try (PreparedStatement usersPs = conn.prepareStatement("SELECT * FROM \"user\" WHERE id = ? ");
+           PreparedStatement authPs = conn.prepareStatement("SELECT * FROM \"authority\" WHERE user_id = ? ")) {
+
+        usersPs.setObject(1, id);
+        authPs.setObject(1, id);
+
+        try (ResultSet resultSet = usersPs.executeQuery()) {
+          if (resultSet.next()) {
+            userAuthEntity.setId(UUID.fromString(resultSet.getString("id")));
+            userAuthEntity.setUsername(resultSet.getString("username"));
+            userAuthEntity.setEnabled(resultSet.getBoolean("enabled"));
+            userAuthEntity.setPassword(resultSet.getString("password"));
+            userAuthEntity.setAccountNonExpired(resultSet.getBoolean("account_non_expired"));
+            userAuthEntity.setAccountNonLocked(resultSet.getBoolean("account_non_locked"));
+            userAuthEntity.setCredentialsNonExpired(resultSet.getBoolean("credentials_non_expired"));
+          } else {
+            return Optional.empty();
+          }
+        }
+
+        try (ResultSet resultSet = authPs.executeQuery()) {
+          List<AuthorityEntity> authorityEntityList = new ArrayList<>();
+
+          while (resultSet.next()) {
+            AuthorityEntity authorityEntity = new AuthorityEntity();
+            authorityEntity.setId(UUID.fromString(resultSet.getString("id")));
+            authorityEntity.setAuthority(Authority.valueOf(resultSet.getString("authority")));
+            authorityEntity.setUser(userAuthEntity);
+            authorityEntityList.add(authorityEntity);
+          }
+
+          userAuthEntity.setAuthorities(authorityEntityList);
         }
       }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-    return Optional.of(user);
+    return Optional.of(userAuthEntity);
+  }
+
+  @Override
+  public Optional<UserEntity> findByIdInUserdata(UUID id) {
+    try (Connection conn = udDs.getConnection()) {
+      try (PreparedStatement usersPs = conn.prepareStatement("SELECT * FROM \"user\" WHERE id = ?")) {
+
+        usersPs.setObject(1, id);
+
+        try (ResultSet resultSet = usersPs.executeQuery()) {
+          if (resultSet.next()) {
+            UserEntity userEntity = new UserEntity();
+            userEntity.setId(UUID.fromString(resultSet.getString("id")));
+            userEntity.setUsername(resultSet.getString("username"));
+            userEntity.setSurname(resultSet.getString("surname"));
+            userEntity.setFirstname(resultSet.getString("firstname"));
+            userEntity.setCurrency(CurrencyValues.valueOf(resultSet.getString("currency")));
+            userEntity.setPhoto(resultSet.getBytes("photo"));
+
+            return Optional.of(userEntity);
+          }
+        }
+      }
+    } catch (SQLException e) {
+		throw new RuntimeException(e);
+	}
+    return Optional.empty();
   }
 
   @Override
   public void deleteInAuthById(UUID id) {
     try (Connection conn = authDs.getConnection()) {
       conn.setAutoCommit(false);
-      try (PreparedStatement usersPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ?");
-           PreparedStatement authorityPs = conn.prepareStatement("DELETE FROM \"authority\" WHERE user_id = ?")) {
+      try (PreparedStatement authorityPs = conn.prepareStatement("DELETE FROM \"authority\" WHERE user_id = ?");
+           PreparedStatement userPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ?")) {
 
         authorityPs.setObject(1, id);
-        usersPs.setObject(1, id);
-        authorityPs.executeUpdate();
-        usersPs.executeUpdate();
+        userPs.setObject(1, id);
 
+        authorityPs.executeUpdate();
+        userPs.executeUpdate();
         conn.commit();
-      } catch (SQLException e) {
+
+      } catch (Exception e) {
         conn.rollback();
         throw e;
       } finally {
         conn.setAutoCommit(true);
       }
+
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -198,19 +212,19 @@ public class UserRepositoryJdbc implements UserRepository {
   public void deleteInUserdataById(UUID id) {
     try (Connection conn = udDs.getConnection()) {
       conn.setAutoCommit(false);
-      try (PreparedStatement usersPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ?");
+      try (PreparedStatement usersPs = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ? ");
            PreparedStatement friendsPs = conn.prepareStatement("DELETE FROM friendship WHERE user_id = ?");
            PreparedStatement invitesPs = conn.prepareStatement("DELETE FROM friendship WHERE friend_id = ?")) {
 
         usersPs.setObject(1, id);
         friendsPs.setObject(1, id);
         invitesPs.setObject(1, id);
+        usersPs.executeUpdate();
         friendsPs.executeUpdate();
         invitesPs.executeUpdate();
-        usersPs.executeUpdate();
 
         conn.commit();
-      } catch (SQLException e) {
+      } catch (Exception e) {
         conn.rollback();
         throw e;
       } finally {
@@ -219,5 +233,59 @@ public class UserRepositoryJdbc implements UserRepository {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public UserEntity updateUserInUserdata(UserEntity userEntity) {
+    try (Connection conn = udDs.getConnection()) {
+      try (PreparedStatement usersPs = conn.prepareStatement("UPDATE \"user\" SET currency = ?, username = ? WHERE id = ?")) {
+        usersPs.setString(1, userEntity.getCurrency().name());
+        usersPs.setString(2, userEntity.getUsername());
+        usersPs.setObject(3, userEntity.getId());
+        usersPs.executeUpdate();
+        return userEntity;
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException();
+    }
+  }
+
+  public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
+    try (Connection conn = authDs.getConnection()) {
+      conn.setAutoCommit(false);
+      try (PreparedStatement usersPs = conn.prepareStatement("UPDATE \"user\" SET username = ? WHERE id = ?");
+           PreparedStatement delAuthPs = conn.prepareStatement("DELETE FROM \"authority\" WHERE user_id = ? ");
+           PreparedStatement insAuthPs = conn.prepareStatement("INSERT INTO \"authority\" (user_id, authority) VALUES (?, ?)")) {
+
+        usersPs.setString(1, userAuthEntity.getUsername());
+        usersPs.setObject(2, userAuthEntity.getId());
+        usersPs.executeUpdate();
+
+        delAuthPs.setObject(1, userAuthEntity.getId());
+        delAuthPs.executeUpdate();
+
+        List<Authority> authorities = userAuthEntity.getAuthorities()
+                .stream()
+                .map(AuthorityEntity::getAuthority)
+                .toList();
+
+        for (Authority authority : authorities) {
+          insAuthPs.setObject(1, userAuthEntity.getId());
+          insAuthPs.setObject(2, authority.name());
+          insAuthPs.addBatch();
+          insAuthPs.clearParameters();
+        }
+        insAuthPs.executeBatch();
+        conn.commit();
+      } catch (Exception e) {
+        conn.rollback();
+        throw e;
+      } finally {
+        conn.setAutoCommit(true);
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+      throw new RuntimeException();
+    }
+    return userAuthEntity;
   }
 }
