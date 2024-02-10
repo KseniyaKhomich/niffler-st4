@@ -11,10 +11,12 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-  //update here if noting or different value from both
   static UserRepository getInstance() {
+    if (System.getProperty("repository").isEmpty()) {
+      throw new RuntimeException("Repository parameter isn't found");
+    }
 
-    return "jdbc".equals(System.getProperty("repository"))
+    return System.getProperty("repository").equals("jdbc")
             ? new UserRepositoryJdbc()
             : new UserRepositorySJdbc();
   }
