@@ -13,6 +13,7 @@ public class LoginTestJDBC extends BaseWebTest {
 	void loginJDBC(UserAuthEntity userAuth) {
 		mainPage.open();
 		welcomePage.clickLoginButton()
-				.loginAsUser(userAuth.getUsername(), userAuth.getPassword());
+				.loginAsUser(userAuth.getUsername(), userAuth.getPassword())
+				.mainContentShouldBeDisplayed();
 	}
 }
