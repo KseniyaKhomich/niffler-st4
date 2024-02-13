@@ -9,21 +9,41 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.message.SuccessMsg;
+import guru.qa.niffler.page.MainPage;
+import io.qameta.allure.Allure;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static com.codeborne.selenide.CollectionCondition.size;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Selectors.byText;
+import static com.codeborne.selenide.Selenide.$;
 
 @ExtendWith(UserRepositoryExtension.class)
 public class SpendingTest extends BaseWebTest {
 
+	static {
+		Configuration.browserSize = "1980x1024";
+	}
+
+	@BeforeEach
+	void doLogin() {
+		Selenide.open("http://127.0.0.1:3000/main");
+		$("a[href*='redirect']").click();
+		$("input[name='username']").setValue("duck");
+		$("input[name='password']").setValue("12345");
+		$("button[type='submit']").click();
+	}
+
 	@GenerateSpend(
-			username = "random54321",
+			username = "duck",
 			description = "QA.GURU Advanced 4",
-			category = "Test1",
 			amount = 72500.00,
+			category = "Обучение",
 			currency = CurrencyValues.RUB
 	)
-	// @DisabledByIssue("74")
+	@DisabledByIssue("74")
 	@Test
 	void spendingShouldBeDeletedByButtonDeleteSpending(SpendJson spend) {
 		mainPage
@@ -34,6 +54,41 @@ public class SpendingTest extends BaseWebTest {
 				.loginAsUser(spend.username(), "test")
 				.deleteFirstSelectedSpending(spend.description())
 				.checkEmptyListOfSpendings();
+
+		$(".spendings-table tbody")
+				.$$("tr")
+				.find(text(spend.description()))
+				.$$("td")
+				.first()
+				.click();
+
+		new MainPage()
+				.getSpendingTable()
+				.checkSpends(spend);
+
+//    Allure.step("Delete spending", () -> $(byText("Delete selected"))
+//        .click());
+//
+//    Allure.step("Check that spending was deleted", () -> {
+//      $(".spendings-table tbody")
+//          .$$("tr")
+//          .shouldHave(size(0));
+//    });
+  }
+
+	@DbUser(username = "randomstatics1")
+	@GenerateCategory(
+			username = "randomstatics1",
+			category = "Обучение"
+	)
+	@Test
+	void checkStatisticsVisibility(UserAuthEntity userAuthEntity) {
+		mainPage.open();
+
+		welcomePage
+				.clickLoginButton()
+				.loginAsUser(userAuthEntity.getUsername(), userAuthEntity.getPassword())
+				.mainContentShouldBeDisplayed();
 	}
 
 	@DbUser(username = "random7")
@@ -54,23 +109,5 @@ public class SpendingTest extends BaseWebTest {
 				.checkMessage(SuccessMsg.SPENDING_MSG);
 
 		mainPage.checkSpendingVisibilityInHistoryTable(categoryJson.category());
-	}
-
-
-	@DbUser(username = "randomstatics1")
-	@GenerateCategory(
-			username = "randomstatics1",
-			category = "Обучение"
-	)
-	@Test
-	void checkStatisticsVisibility(UserAuthEntity userAuthEntity) {
-		mainPage
-				.open();
-
-		welcomePage
-				.clickLoginButton()
-				.loginAsUser(userAuthEntity.getUsername(), userAuthEntity.getPassword())
-				.mainContentShouldBeDisplayed();
-
 	}
 }

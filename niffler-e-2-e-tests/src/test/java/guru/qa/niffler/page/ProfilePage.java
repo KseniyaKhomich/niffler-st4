@@ -5,6 +5,7 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.model.CurrencyValues;
 import io.qameta.allure.Step;
+import guru.qa.niffler.page.message.SuccessMsg;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +15,10 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class ProfilePage extends BasePage<ProfilePage>{
+	public static final String PAGE_URL = CFG.frontUrl() + "/profile";
 
+	private final SelenideElement avatarInput = $("input[type='file']");
+	private final SelenideElement avatar = $(".profile__avatar");
 	private final SelenideElement nameInput = $("input[name='firstname']");
 	private final SelenideElement surnameInput = $("input[name='surname']");
 	private final SelenideElement currencyInput = $("input[type='text']");
@@ -50,4 +54,12 @@ public class ProfilePage extends BasePage<ProfilePage>{
 				.map(SelenideElement::getText)
 				.collect(Collectors.toList());
 	}
+
+  public ProfilePage addAvatar(String imagePath) {
+    avatar.click();
+    avatarInput.uploadFromClasspath(imagePath);
+	submitButton.click();
+    checkMessage(SuccessMsg.PROFILE_MSG);
+    return this;
+  }
 }

@@ -73,9 +73,6 @@ public class LoginTest extends BaseWebTest {
             .loginAsUser(userAuth.getUsername(), userAuth.getPassword());
 
     new MainPage()
-        .mainContentShouldBeDisplayed();
-
-
-    $(".main-content__section-stats").should(visible);
+			.checkThatStatisticDisplayed();
   }
 }
