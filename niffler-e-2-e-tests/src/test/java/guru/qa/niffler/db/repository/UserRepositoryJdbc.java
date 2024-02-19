@@ -235,6 +235,7 @@ public class UserRepositoryJdbc implements UserRepository {
     }
   }
 
+  @Override
   public UserEntity updateUserInUserdata(UserEntity userEntity) {
     try (Connection conn = udDs.getConnection()) {
       try (PreparedStatement usersPs = conn.prepareStatement("UPDATE \"user\" SET currency = ?, username = ? WHERE id = ?")) {
@@ -249,6 +250,7 @@ public class UserRepositoryJdbc implements UserRepository {
     }
   }
 
+  @Override
   public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
     try (Connection conn = authDs.getConnection()) {
       conn.setAutoCommit(false);
