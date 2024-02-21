@@ -1,6 +1,7 @@
 package guru.qa.niffler.db.model;
 
 import guru.qa.niffler.model.CurrencyValues;
+import guru.qa.niffler.model.SpendJson;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +38,7 @@ public class SpendingEntity implements Serializable {
 	@Column(nullable = false)
 	private String description;
 
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "category_id", referencedColumnName = "id")
 	private CategoryEntity category;
 
@@ -55,5 +56,17 @@ public class SpendingEntity implements Serializable {
 	@Override
 	public final int hashCode() {
 		return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+	}
+
+	public SpendJson toJson() {
+		return new SpendJson(
+				this.getId(),
+				this.getSpendDate(),
+				this.getCategory().getCategory(),
+				this.getCurrency(),
+				this.getAmount(),
+				this.getDescription(),
+				this.getUsername()
+		);
 	}
 }

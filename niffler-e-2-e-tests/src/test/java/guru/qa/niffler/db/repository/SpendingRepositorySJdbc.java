@@ -34,6 +34,21 @@ public class SpendingRepositorySJdbc implements SpendingRepository {
 	public SpendingEntity createSpending(SpendingEntity spendingEntity) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		return spendTxt.execute(status -> {
+			spendTemplate.update(con -> {
+				PreparedStatement ps = con.prepareStatement(
+						"INSERT INTO \"category\" " +
+								"(category, username) " +
+								"VALUES (?, ?)",
+						PreparedStatement.RETURN_GENERATED_KEYS
+				);
+
+				ps.setString(1, spendingEntity.getCategory().getCategory());
+				ps.setString(2, spendingEntity.getUsername());
+				return ps;
+			}, keyHolder);
+
+			spendingEntity.getCategory().setId((UUID) keyHolder.getKeys().get("id"));
+
 			 spendTemplate.update(con -> {
 				 PreparedStatement ps = con.prepareStatement(
 						 "INSERT INTO \"spend\" " +
@@ -43,7 +58,7 @@ public class SpendingRepositorySJdbc implements SpendingRepository {
 				 );
 
 				 ps.setString(1, spendingEntity.getUsername());
-				 ps.setDate(2, (Date) spendingEntity.getSpendDate());
+				 ps.setDate(2, new Date(spendingEntity.getSpendDate().getTime()));
 				 ps.setString(3, spendingEntity.getCurrency().name());
 				 ps.setDouble(4, spendingEntity.getAmount());
 				 ps.setString(5, spendingEntity.getDescription());
@@ -51,32 +66,9 @@ public class SpendingRepositorySJdbc implements SpendingRepository {
 				 return ps;
 			 }, keyHolder);
 
-			spendingEntity.setId((UUID) keyHolder.getKeys().get("id"));
+			spendingEntity.setId((UUID) keyHolder.getKeys().get("id")); //checkId
 
 			return spendingEntity;
-		});
-	}
-
-	@Override
-	public CategoryEntity createCategory(CategoryEntity categoryEntity) {
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		return spendTxt.execute(status -> {
-			spendTemplate.update(con -> {
-				PreparedStatement ps = con.prepareStatement(
-						"INSERT INTO \"category\" " +
-								"(category, username) " +
-								"VALUES (?, ?)",
-						PreparedStatement.RETURN_GENERATED_KEYS
-				);
-
-				ps.setString(1, categoryEntity.getCategory());
-				ps.setString(2, categoryEntity.getCategory());
-				return ps;
-			}, keyHolder);
-
-			categoryEntity.setId((UUID) keyHolder.getKeys().get("id"));
-
-			return categoryEntity;
 		});
 	}
 }

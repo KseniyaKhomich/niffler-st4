@@ -25,6 +25,4 @@ public interface SpendingRepository {
 	};
 
 	SpendingEntity createSpending(SpendingEntity spendingEntity);
-
-	CategoryEntity createCategory(CategoryEntity categoryEntity);
 }
