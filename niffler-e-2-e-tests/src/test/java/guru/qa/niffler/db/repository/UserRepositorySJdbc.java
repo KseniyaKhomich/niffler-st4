@@ -153,4 +153,49 @@ public class UserRepositorySJdbc implements UserRepository {
       return null;
     });
   }
+
+  @Override
+  public UserAuthEntity updateUserInAuth(UserAuthEntity userAuthEntity) {
+     return authTxt.execute(status -> {
+
+       authTemplate.update(
+               "UPDATE \"user\" SET username = ? WHERE id = ?",
+               userAuthEntity.getUsername(),
+               userAuthEntity.getId()
+       );
+
+       authTemplate.update(
+               "DELETE FROM \"authority\" WHERE user_id = ?",
+               userAuthEntity.getId()
+       );
+
+       authTemplate.batchUpdate("INSERT INTO \"authority\" " +
+               "(user_id, authority) " +
+               "VALUES (?, ?)", new BatchPreparedStatementSetter() {
+         @Override
+         public void setValues(PreparedStatement ps, int i) throws SQLException {
+           ps.setObject(1, userAuthEntity.getId());
+           ps.setString(2, userAuthEntity.getAuthorities().get(i).getAuthority().name());
+         }
+
+         @Override
+         public int getBatchSize() {
+           return userAuthEntity.getAuthorities().size();
+         }
+       });
+
+       return userAuthEntity;
+	});
+  }
+
+  @Override
+  public UserEntity updateUserInUserdata(UserEntity userEntity) {
+    udTemplate.update(
+            "UPDATE \"user\" SET currency = ?, username = ? WHERE id = ?",
+            userEntity.getCurrency().name(),
+            userEntity.getUsername(),
+            userEntity.getId());
+
+    return userEntity;
+  }
 }

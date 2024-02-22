@@ -3,13 +3,14 @@ package guru.qa.niffler.jupiter;
 import com.github.javafaker.Faker;
 import guru.qa.niffler.db.model.*;
 import guru.qa.niffler.db.repository.UserRepository;
-import guru.qa.niffler.db.repository.UserRepositoryJdbc;
 import guru.qa.niffler.jupiter.annotation.DbUser;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 	public static final ExtensionContext.Namespace NAMESPACE
@@ -17,7 +18,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCa
 
 	Faker faker = new Faker();
 
-	private final UserRepository userRepository = new UserRepositoryJdbc();
+	private final UserRepository userRepository = UserRepository.getInstance();
 
 
 	@Override
