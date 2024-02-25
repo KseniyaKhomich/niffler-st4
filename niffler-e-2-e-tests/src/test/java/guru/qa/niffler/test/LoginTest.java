@@ -69,13 +69,11 @@ public class LoginTest extends BaseWebTest {
     Selenide.open("http://127.0.0.1:3000/main");
     $("a[href*='redirect']").click();
 
-//    new LoginPage()
-//        .setLogin(userAuth.getUsername())
-//        .setPassword(userAuth.getPassword())
-//        .submit();
-//
-//    new MainPage()
-//        .checkThatStatisticDisplayed();
+    new LoginPage()
+            .loginAsUser(userAuth.getUsername(), userAuth.getPassword());
+
+    new MainPage()
+        .mainContentShouldBeDisplayed();
 
 
     $(".main-content__section-stats").should(visible);
