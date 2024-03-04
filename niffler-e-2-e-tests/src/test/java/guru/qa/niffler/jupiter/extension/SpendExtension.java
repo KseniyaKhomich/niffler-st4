@@ -12,12 +12,14 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import java.util.Date;
 import java.util.Optional;
 
-public class SpendExtension implements BeforeEachCallback {
+public abstract class SpendExtension implements BeforeEachCallback {
 
   public static final ExtensionContext.Namespace NAMESPACE
       = ExtensionContext.Namespace.create(SpendExtension.class);
 
   private final SpendClient spendClient = new SpendClient();
+
+  public abstract SpendJson create(SpendJson spend) throws IOException;
 
   @Override
   public void beforeEach(ExtensionContext extensionContext) throws Exception {
@@ -40,7 +42,7 @@ public class SpendExtension implements BeforeEachCallback {
       SpendJson spendJson = new SpendJson(
           null,
           new Date(),
-          categoryData.category(),
+          spendData.category(),
           spendData.currency(),
           spendData.amount(),
           spendData.description(),
