@@ -9,7 +9,6 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.message.SuccessMsg;
-import guru.qa.niffler.test.BaseWebTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -17,13 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(UserRepositoryExtension.class)
 public class SpendingTest extends BaseWebTest {
 
-	@GenerateCategory(
-			username = "random54321",
-			category = "Test1"
-	)
 	@GenerateSpend(
 			username = "random54321",
 			description = "QA.GURU Advanced 4",
+			category = "Test1",
 			amount = 72500.00,
 			currency = CurrencyValues.RUB
 	)
