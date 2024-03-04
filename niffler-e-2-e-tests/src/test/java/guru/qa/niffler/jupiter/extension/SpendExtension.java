@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -28,17 +29,8 @@ public abstract class SpendExtension implements BeforeEachCallback {
         GenerateSpend.class
     );
 
-    Optional<GenerateCategory> category = AnnotationSupport.findAnnotation(
-            extensionContext.getRequiredTestMethod(),
-            GenerateCategory.class
-    );
-
-    if (spend.isPresent() && category.isPresent()) {
-      CategoryJson categoryData = extensionContext.getStore(CategoryExtension.NAMESPACE)
-              .get(extensionContext.getUniqueId(), CategoryJson.class);
-
+    if (spend.isPresent()) {
       GenerateSpend spendData = spend.get();
-
       SpendJson spendJson = new SpendJson(
           null,
           new Date(),
