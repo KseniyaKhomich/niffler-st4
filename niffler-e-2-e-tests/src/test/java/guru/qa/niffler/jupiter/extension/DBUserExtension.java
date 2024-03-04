@@ -30,7 +30,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCa
 			DbUser annotationData = annotation.get();
 
 			String username = annotationData.username().isEmpty() ? faker.name().username() : annotationData.username();
-			String password = annotationData.password().isEmpty() ? faker.internet().password() : annotationData.password();
+			String password = annotationData.password().isEmpty() ? faker.internet().password(3,12) : annotationData.password();
 
 			UserAuthEntity userAuth = new UserAuthEntity();
 			userAuth.setUsername(username);

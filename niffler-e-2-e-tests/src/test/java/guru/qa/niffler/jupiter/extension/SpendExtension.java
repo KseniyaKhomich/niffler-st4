@@ -1,13 +1,13 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.spend.SpendClient;
+import guru.qa.niffler.jupiter.annotation.GenerateCategory;
 import guru.qa.niffler.jupiter.annotation.GenerateSpend;
+import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
-
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
-
 
 import java.io.IOException;
 import java.util.Date;
@@ -31,7 +31,6 @@ public abstract class SpendExtension implements BeforeEachCallback {
 
     if (spend.isPresent()) {
       GenerateSpend spendData = spend.get();
-
       SpendJson spendJson = new SpendJson(
           null,
           new Date(),

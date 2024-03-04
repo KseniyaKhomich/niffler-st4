@@ -6,6 +6,7 @@ import guru.qa.niffler.model.CategoryJson;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class CategoryExtension implements BeforeEachCallback, ParameterResolver {
@@ -26,14 +27,13 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver 
 
 		if (category.isPresent()) {
 			GenerateCategory categoryData = category.get();
-
 			CategoryJson categoryJson = new CategoryJson(
 					null,
 					categoryData.category(),
 					categoryData.username());
 
 			CategoryJson created = categoryClient.addCategory(categoryJson);
-			extensionContext.getStore(NAMESPACE).put("category", created);
+			extensionContext.getStore(NAMESPACE).put(extensionContext.getUniqueId(), created);
 		}
 
 	}
@@ -48,6 +48,6 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver 
 	@Override
 	public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
 		return extensionContext.getStore(NAMESPACE)
-				.get("category", CategoryJson.class);
+				.get(extensionContext.getUniqueId(), CategoryJson.class);
 	}
 }
