@@ -10,7 +10,7 @@ import guru.qa.niffler.db.repository.UserRepository;
 import guru.qa.niffler.jupiter.annotation.DbUser;
 import guru.qa.niffler.jupiter.extension.UserRepositoryExtension;
 import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.page.mainPage.MainPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,12 +70,10 @@ public class LoginTest extends BaseWebTest {
     $("a[href*='redirect']").click();
 
     new LoginPage()
-        .setLogin(userAuth.getUsername())
-        .setPassword(userAuth.getPassword())
-        .submit();
+            .loginAsUser(userAuth.getUsername(), userAuth.getPassword());
 
     new MainPage()
-        .checkThatStatisticDisplayed();
+        .mainContentShouldBeDisplayed();
 
 
     $(".main-content__section-stats").should(visible);

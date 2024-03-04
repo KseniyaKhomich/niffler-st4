@@ -1,11 +1,11 @@
 package guru.qa.niffler.jupiter;
 
-import guru.qa.niffler.api.CategoryApi;
-import guru.qa.niffler.api.SpendApi;
+import guru.qa.niffler.api.category.CategoryApi;
+import guru.qa.niffler.api.spend.SpendApi;
+import guru.qa.niffler.jupiter.extension.SpendExtension;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 import okhttp3.OkHttpClient;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -23,7 +23,7 @@ public class RestSpendExtension extends SpendExtension {
 	private final CategoryApi categoryApi = retrofit.create(CategoryApi.class);
 
 	@Override
-	SpendJson create(SpendJson spend) throws IOException {
+	public SpendJson create(SpendJson spend) throws IOException {
 		CategoryJson categoryJson = new CategoryJson(
 				null,
 				spend.category(),

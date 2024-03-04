@@ -1,17 +1,13 @@
 package guru.qa.niffler.jupiter.extension;
 
-import guru.qa.niffler.api.SpendApi;
-import guru.qa.niffler.jupiter.annotation.GenerateCategory;
+import guru.qa.niffler.api.spend.SpendClient;
 import guru.qa.niffler.jupiter.annotation.GenerateSpend;
-import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.model.UserJson;
-import okhttp3.OkHttpClient;
+
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
+
 
 import java.io.IOException;
 import java.util.Date;
@@ -22,10 +18,12 @@ public abstract class SpendExtension implements BeforeEachCallback {
   public static final ExtensionContext.Namespace NAMESPACE
       = ExtensionContext.Namespace.create(SpendExtension.class);
 
-  abstract SpendJson create(SpendJson spend) throws IOException;
+  private final SpendClient spendClient = new SpendClient();
+
+  public abstract SpendJson create(SpendJson spend) throws IOException;
 
   @Override
-  public void beforeEach(ExtensionContext extensionContext) throws IOException {
+  public void beforeEach(ExtensionContext extensionContext) throws Exception {
     Optional<GenerateSpend> spend = AnnotationSupport.findAnnotation(
         extensionContext.getRequiredTestMethod(),
         GenerateSpend.class
@@ -44,9 +42,9 @@ public abstract class SpendExtension implements BeforeEachCallback {
           spendData.username()
       );
 
-      SpendJson createdSpend = create(spendJson);
+      SpendJson created = spendClient.addSpend(spendJson);
       extensionContext.getStore(NAMESPACE)
-          .put(extensionContext.getUniqueId(), createdSpend);
+          .put(extensionContext.getUniqueId(), created);
     }
   }
 }

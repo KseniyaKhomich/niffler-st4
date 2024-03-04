@@ -1,4 +1,4 @@
-package guru.qa.niffler.pages;
+package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.model.UserJson;
@@ -8,7 +8,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
-public class FriendsPage {
+public class FriendsPage extends BasePage<FriendsPage> {
 
 	private final SelenideElement noFriendsMessageElement = $(byText("There are no friends yet!"));
 	private final SelenideElement friendsTable = $(".table");
