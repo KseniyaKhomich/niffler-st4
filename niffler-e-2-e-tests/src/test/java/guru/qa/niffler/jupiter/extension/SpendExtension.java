@@ -5,14 +5,19 @@ import guru.qa.niffler.jupiter.annotation.GenerateCategory;
 import guru.qa.niffler.jupiter.annotation.GenerateSpend;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.UserJson;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
-public class SpendExtension implements BeforeEachCallback {
+public abstract class SpendExtension implements BeforeEachCallback {
 
   public static final ExtensionContext.Namespace NAMESPACE
       = ExtensionContext.Namespace.create(SpendExtension.class);
@@ -26,21 +31,13 @@ public class SpendExtension implements BeforeEachCallback {
         GenerateSpend.class
     );
 
-    Optional<GenerateCategory> category = AnnotationSupport.findAnnotation(
-            extensionContext.getRequiredTestMethod(),
-            GenerateCategory.class
-    );
-
-    if (spend.isPresent() && category.isPresent()) {
-      CategoryJson categoryData = extensionContext.getStore(CategoryExtension.NAMESPACE)
-              .get("category", CategoryJson.class);
-
+    if (spend.isPresent()) {
       GenerateSpend spendData = spend.get();
 
       SpendJson spendJson = new SpendJson(
           null,
           new Date(),
-          categoryData.category(),
+          spendData.category(),
           spendData.currency(),
           spendData.amount(),
           spendData.description(),
@@ -49,7 +46,7 @@ public class SpendExtension implements BeforeEachCallback {
 
       SpendJson created = spendClient.addSpend(spendJson);
       extensionContext.getStore(NAMESPACE)
-          .put("spend", created);
+          .put(extensionContext.getUniqueId(), createdSpend);
     }
   }
 }
