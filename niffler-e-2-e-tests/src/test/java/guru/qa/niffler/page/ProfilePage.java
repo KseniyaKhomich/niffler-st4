@@ -22,7 +22,7 @@ public class ProfilePage extends BasePage<ProfilePage>{
 	private final SelenideElement submitButton = $("button[type='submit']");
 	private final SelenideElement categoryNameInput = $("input[name='category']");
 	private final SelenideElement createButton = $(byText("Create"));
-	private final ElementsCollection categoryItems = $$("categories__item");
+	private final ElementsCollection categoryItems = $$(".categories__item");
 
 	@Step("Add category with {categoryName} name")
 	public ProfilePage addCategory(String categoryName) {
@@ -45,6 +45,7 @@ public class ProfilePage extends BasePage<ProfilePage>{
 
 	@Step("Get spending categories")
 	public List<String> getCategories() {
+		System.out.println(categoryItems.size());
 		return categoryItems.stream()
 				.map(SelenideElement::getText)
 				.collect(Collectors.toList());
