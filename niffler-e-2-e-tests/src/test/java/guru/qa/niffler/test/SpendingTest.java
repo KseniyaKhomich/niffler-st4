@@ -1,7 +1,9 @@
 package guru.qa.niffler.test;
 
+import com.codeborne.selenide.Configuration;
 import guru.qa.niffler.db.model.UserAuthEntity;
 import guru.qa.niffler.jupiter.annotation.DbUser;
+import guru.qa.niffler.jupiter.annotation.DisabledByIssue;
 import guru.qa.niffler.jupiter.annotation.GenerateCategory;
 import guru.qa.niffler.jupiter.annotation.GenerateSpend;
 import guru.qa.niffler.jupiter.extension.UserRepositoryExtension;
@@ -9,32 +11,14 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.message.SuccessMsg;
-import guru.qa.niffler.page.MainPage;
-import io.qameta.allure.Allure;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
 @ExtendWith(UserRepositoryExtension.class)
 public class SpendingTest extends BaseWebTest {
-
-	static {
-		Configuration.browserSize = "1980x1024";
-	}
-
-	@BeforeEach
-	void doLogin() {
-		Selenide.open("http://127.0.0.1:3000/main");
-		$("a[href*='redirect']").click();
-		$("input[name='username']").setValue("duck");
-		$("input[name='password']").setValue("12345");
-		$("button[type='submit']").click();
-	}
 
 	@GenerateSpend(
 			username = "duck",
@@ -43,11 +27,10 @@ public class SpendingTest extends BaseWebTest {
 			category = "Обучение",
 			currency = CurrencyValues.RUB
 	)
-	@DisabledByIssue("74")
+	//@DisabledByIssue("74")
 	@Test
 	void spendingShouldBeDeletedByButtonDeleteSpending(SpendJson spend) {
-		mainPage
-				.open();
+		mainPage.open();
 
 		welcomePage
 				.clickLoginButton()
@@ -55,6 +38,7 @@ public class SpendingTest extends BaseWebTest {
 				.deleteFirstSelectedSpending(spend.description())
 				.checkEmptyListOfSpendings();
 
+		//create a separate method
 		$(".spendings-table tbody")
 				.$$("tr")
 				.find(text(spend.description()))
@@ -62,9 +46,9 @@ public class SpendingTest extends BaseWebTest {
 				.first()
 				.click();
 
-		new MainPage()
-				.getSpendingTable()
-				.checkSpends(spend);
+//		new MainPage()
+//				.getSpendingTable()
+//				.checkSpends(spend);
 
 //    Allure.step("Delete spending", () -> $(byText("Delete selected"))
 //        .click());

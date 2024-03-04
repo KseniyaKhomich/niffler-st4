@@ -2,7 +2,8 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.page.components.HeaderComponent;
+import guru.qa.niffler.page.component.HeaderComponent;
+import guru.qa.niffler.page.mainPage.MainPage;
 import guru.qa.niffler.page.message.Msg;
 import io.qameta.allure.Step;
 
@@ -37,5 +38,11 @@ public abstract class BasePage<T extends BasePage> {
   @Step("Navigate to People page")
   public PeoplePage clickOnPeopleHeaderTab() {
     return headerComponent.clickOnPeopleTab();
+  }
+
+  @Step("check avatar")
+  public T checkAvatar(String imageName) {
+    headerComponent.checkAvatar(imageName);
+    return (T) this;
   }
 }

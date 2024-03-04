@@ -5,7 +5,7 @@ import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.BasePage;
 import guru.qa.niffler.page.mainPage.component.AddSpendingComponent;
-import guru.qa.niffler.page.mainPage.component.SpendingsComponent;
+import guru.qa.niffler.page.mainPage.component.SpendingTable;
 import io.qameta.allure.Step;
 
 import static com.codeborne.selenide.Selenide.$;
@@ -13,7 +13,7 @@ import static com.codeborne.selenide.Selenide.$;
 public class MainPage extends BasePage<MainPage> {
 
 	private static final String MAIN_URL = "http://127.0.0.1:3000/main";
-	private final SpendingsComponent spendingsComponent = new SpendingsComponent();
+	private final SpendingTable spendingTable = new SpendingTable();
 	private final AddSpendingComponent addSpendingComponent = new AddSpendingComponent();
 
 	private final SelenideElement mainContentComponent = $(".main-content");
@@ -32,19 +32,19 @@ public class MainPage extends BasePage<MainPage> {
 
 	@Step("Delete spending by description - {spendDescription}")
 	public MainPage deleteFirstSelectedSpending(String spendDescription) {
-		spendingsComponent.selectFirstSpendingByDescription(spendDescription).deleteSelectedSpendings();
+		spendingTable.selectFirstSpendingByDescription(spendDescription).deleteSelectedSpendings();
 		return this;
 	}
 
 	@Step("Check empty list of spensings")
 	public MainPage checkEmptyListOfSpendings() {
-		spendingsComponent.checkEmptyListOfSpendings();
+		spendingTable.checkEmptyListOfSpendings();
 		return this;
 	}
 
 	@Step("Check spending visibility in History of Spending  by category name - {}")
 	public MainPage checkSpendingVisibilityInHistoryTable(String categoryName) {
-		spendingsComponent.checkVisibilityOfSpendingByCategoryName(categoryName);
+		spendingTable.checkVisibilityOfSpendingByCategoryName(categoryName);
 		return this;
 	}
 
@@ -52,5 +52,10 @@ public class MainPage extends BasePage<MainPage> {
 	public MainPage mainContentShouldBeDisplayed() {
 		mainContentComponent.shouldBe(Condition.visible);
 		return this;
+	}
+
+	public SpendingTable getSpendingTable() {
+		spendingTable.getSelf().scrollIntoView(true);
+		return spendingTable;
 	}
 }

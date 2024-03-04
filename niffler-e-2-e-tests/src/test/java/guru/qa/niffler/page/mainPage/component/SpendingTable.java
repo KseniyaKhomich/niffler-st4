@@ -1,20 +1,31 @@
 package guru.qa.niffler.page.mainPage.component;
 
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.page.component.BaseComponent;
 
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
+import static guru.qa.niffler.condition.SpendCollectionCondition.spends;
 
-public class SpendingsComponent {
+public class SpendingTable extends BaseComponent<SpendingTable> {
 
-	private final SelenideElement spendingsTable = $(".spendings-table tbody");
 	private final SelenideElement deleteSelectedButton = $(byText("Delete selected"));
 
-	public SpendingsComponent selectFirstSpendingByDescription(String spendDescription) {
-		spendingsTable
+	public SpendingTable() {
+		super($(".spendings-table tbody"));
+	}
+
+	public SpendingTable checkSpends(SpendJson... expectedSpends) {
+		getSelf().$$("tr").should(spends(expectedSpends));
+		return this;
+	}
+
+	public SpendingTable selectFirstSpendingByDescription(String spendDescription) {
+		getSelf()
 				.$$("tr")
 				.find(text(spendDescription))
 				.$("td")
@@ -23,20 +34,20 @@ public class SpendingsComponent {
 		return this;
 	}
 
-	public SpendingsComponent deleteSelectedSpendings() {
+	public SpendingTable deleteSelectedSpendings() {
 		deleteSelectedButton.click();
 		return this;
 	}
 
-	public SpendingsComponent checkEmptyListOfSpendings() {
-		spendingsTable
+	public SpendingTable checkEmptyListOfSpendings() {
+		getSelf()
 				.$$("tr")
 				.shouldHave(size(0));
 		return this;
 	}
 
-	public SpendingsComponent checkVisibilityOfSpendingByCategoryName(String categoryName) {
-		spendingsTable
+	public SpendingTable checkVisibilityOfSpendingByCategoryName(String categoryName) {
+		getSelf()
 				.$$("tr")
 				.find(text(categoryName))
 				.shouldBe(visible);
