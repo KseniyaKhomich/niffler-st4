@@ -65,7 +65,7 @@ public class LoginTest extends BaseWebTest {
 
   @DbUser()
   @Test
-  void statisticShouldBeVisibleAfterLogin() {
+  void statisticShouldBeVisibleAfterLogin(UserAuthEntity userAuth) {
     Selenide.open("http://127.0.0.1:3000/main");
     $("a[href*='redirect']").click();
 

@@ -1,6 +1,8 @@
 package guru.qa.niffler.jupiter.extension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
+import guru.qa.niffler.db.logging.JsonAllureAppender;
 import guru.qa.niffler.db.model.*;
 import guru.qa.niffler.db.repository.UserRepository;
 import guru.qa.niffler.jupiter.annotation.DbUser;
@@ -22,7 +24,7 @@ public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCa
 
 
 	@Override
-	public void beforeEach(ExtensionContext extensionContext) {
+	public void beforeEach(ExtensionContext extensionContext) throws JsonProcessingException {
 		Map<String, Object> entities = new HashMap<>();
 		Optional<DbUser> annotation = AnnotationSupport.findAnnotation(extensionContext.getRequiredTestMethod(), DbUser.class);
 
@@ -49,6 +51,8 @@ public class DBUserExtension implements BeforeEachCallback, AfterTestExecutionCa
 
 			entities.put("userAuth", createdUserAuth);
 			entities.put("user", createdUserEntity);
+
+			new JsonAllureAppender().logJson("Created entity in USERDATA", createdUserEntity);
 
 		}
 		extensionContext.getStore(NAMESPACE).put(extensionContext.getUniqueId(), entities);
