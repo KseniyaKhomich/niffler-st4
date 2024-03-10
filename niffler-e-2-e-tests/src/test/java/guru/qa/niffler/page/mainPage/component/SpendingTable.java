@@ -20,7 +20,9 @@ public class SpendingTable extends BaseComponent<SpendingTable> {
 	}
 
 	public SpendingTable checkSpends(SpendJson... expectedSpends) {
-		getSelf().$$("tr").should(spends(expectedSpends));
+		getSelf()
+				.$$("tr")
+				.should(spends(expectedSpends));
 		return this;
 	}
 
@@ -51,6 +53,26 @@ public class SpendingTable extends BaseComponent<SpendingTable> {
 				.$$("tr")
 				.find(text(categoryName))
 				.shouldBe(visible);
+		return this;
+	}
+
+	public SpendingTable selectRowByText(String searchValue) {
+		getSelf()
+				.$$("tr")
+				.find(text(searchValue))
+				.find("input[type='checkbox']")
+				.scrollTo()
+				.click();
+		return this;
+	}
+
+	public SpendingTable selectRowByIndex(int index) {
+		getSelf()
+				.$$("tr")
+				.get(index)
+				.find("input[type='checkbox']")
+				.scrollTo()
+				.click();
 		return this;
 	}
 }

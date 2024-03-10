@@ -1,6 +1,9 @@
 package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Configuration;
+import guru.qa.niffler.api.category.CategoryApi;
+import guru.qa.niffler.api.category.CategoryClient;
+import guru.qa.niffler.api.spend.SpendClient;
 import guru.qa.niffler.db.model.UserAuthEntity;
 import guru.qa.niffler.jupiter.annotation.DbUser;
 import guru.qa.niffler.jupiter.annotation.DisabledByIssue;
@@ -13,6 +16,12 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.message.SuccessMsg;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
@@ -37,28 +46,8 @@ public class SpendingTest extends BaseWebTest {
 				.loginAsUser(spend.username(), "test")
 				.deleteFirstSelectedSpending(spend.description())
 				.checkEmptyListOfSpendings();
+	}
 
-		//create a separate method
-		$(".spendings-table tbody")
-				.$$("tr")
-				.find(text(spend.description()))
-				.$$("td")
-				.first()
-				.click();
-
-//		new MainPage()
-//				.getSpendingTable()
-//				.checkSpends(spend);
-
-//    Allure.step("Delete spending", () -> $(byText("Delete selected"))
-//        .click());
-//
-//    Allure.step("Check that spending was deleted", () -> {
-//      $(".spendings-table tbody")
-//          .$$("tr")
-//          .shouldHave(size(0));
-//    });
-  }
 
 	@DbUser(username = "randomstatics1")
 	@GenerateCategory(
@@ -93,5 +82,55 @@ public class SpendingTest extends BaseWebTest {
 				.checkMessage(SuccessMsg.SPENDING_MSG);
 
 		mainPage.checkSpendingVisibilityInHistoryTable(categoryJson.category());
+	}
+
+	@DbUser
+	@Test
+	void deleteSelectedRowsInSpendingTable(UserAuthEntity userAuthEntity) throws IOException, ParseException {
+		CategoryJson categoryJson = new CategoryJson(
+				null,
+				"randomCategory",
+				userAuthEntity.getUsername()
+		);
+
+		new CategoryClient().addCategory(categoryJson);
+
+
+		SpendJson spend1 = new SpendJson(
+				null,
+				new SimpleDateFormat("dd MMM yy", Locale.ENGLISH).parse("05 Mar 24"),
+				categoryJson.category(),
+				CurrencyValues.USD,
+				10.000,
+				"randomSpend1",
+				userAuthEntity.getUsername()
+		);
+		SpendJson spend2 = new SpendJson(
+				null,
+				new SimpleDateFormat("dd MMM yy", Locale.ENGLISH).parse("05 Mar 24"),
+				categoryJson.category(),
+				CurrencyValues.EUR,
+				20.000,
+				"randomSpend2",
+				userAuthEntity.getUsername()
+		);
+
+		SpendClient spendClient = new SpendClient();
+
+		spendClient.addSpend(spend1);
+		spendClient.addSpend(spend2);
+
+
+		mainPage.open();
+
+		welcomePage
+				.clickLoginButton()
+				.loginAsUser(userAuthEntity.getUsername(), userAuthEntity.getPassword())
+				.getSpendingTable()
+				.checkSpends(spend1, spend2)
+				.selectRowByIndex(1)
+				.selectRowByText(spend1.description())
+				.deleteSelectedSpendings()
+				.checkEmptyListOfSpendings();
 	}
 }
